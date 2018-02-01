@@ -6,11 +6,6 @@
 #include <algorithm>
 #include <random>
 
-// Implementation of several ADT's.
-
-// Some use C++ classes under the hood. Will be replaced with 
-// custom implementation in time to come.
-
 using namespace std;
 
 // To generate uniform random numbers
@@ -21,6 +16,22 @@ int gen() {
     return dis(generator);
 }
 
+// Helpers
+////////////////////////////////////////////////////////////////////
+void getvect(vector<int>& source, size_t num = 10) {
+    cout << "getvect(): ";
+    while(source.size() <= num) {
+        int i = gen();
+        if (find(source.begin(), source.end(), i) == source.end()) {
+            source.push_back(i);
+            cout << i << ",";
+        }
+    }
+    cout << endl;
+}
+
+// Classes
+////////////////////////////////////////////////////////////////////
 class Heap
 {
     public:
@@ -56,18 +67,24 @@ class Heap
         vector<int> data;
 };
 
-
-void getvect(vector<int>& source, size_t num = 10) {
-    cout << "getvect(): ";
-    while(source.size() <= num) {
-        int i = gen();
-        if (find(source.begin(), source.end(), i) == source.end()) {
-            source.push_back(i);
-            cout << i << ",";
+// Creating custom iterators in C++
+class MyIterator
+{
+    public:
+        MyIterator() {
+            getvect(v);
         }
-    }
-    cout << endl;
-}
+ 
+        typedef vector<int>::iterator       iterator;
+        typedef vector<int>::const_iterator const_iterator;
 
+        iterator begin()        { return v.begin();  }
+        iterator end()          { return v.end();    }
+        const_iterator cbegin() { return v.cbegin(); }
+        const_iterator cend()   { return v.cend();   }
+
+    private:
+        vector<int> v;
+};
 #endif
 
