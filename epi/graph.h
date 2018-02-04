@@ -22,12 +22,16 @@ class Graph
                 g[n] = {};
         }
 
-        void addedge(int source, int dest) {
+        void addedge(int source, int dest, int weight = 1) {
             auto it = g.find(source);
             auto it2 = g.find(dest);
             if(it  == g.end()) throw runtime_error("Invalid source");
             if(it2 == g.end()) throw runtime_error("Invalid destination");
+
             it->second.push_back(it2->first);
+
+            // Uncomment to make the graph undirected
+            // it2->second.push_back(it->first);
         }
 
         void print() const {
@@ -39,10 +43,23 @@ class Graph
             }
         }
 
-        const list<int>& get_adj(int node) const{
+        const list<int>& get_out(int node) const{
             auto it = g.find(node);
             if(it == g.end()) throw runtime_error("Invalid node id");
             return it->second;
+        }
+
+        list<int> get_in(int node) const {
+            list<int> in;
+            for(const auto& n: g)
+                for(const auto& i: n.second)
+                    if(i == node)
+                        in.push_back(n.first);
+            return in;
+        }
+
+        const map<int, list<int>>& get_graph() const {
+            return g;
         }
 };
 
@@ -56,14 +73,15 @@ void DFS(const Graph& g, int start)
     while(!s.empty()) {
         int curr = s.top(); s.pop();
 
-        if(visited.find(curr) == visited.end())
+        if(visited.find(curr) == visited.end()) {
             cout << "Visited " << curr << endl;
 
-        visited.insert(curr);
+            const list<int>& adj = g.get_out(curr);
+            for(const auto& i: adj)
+                s.emplace(i);
+        }
 
-        const list<int>& adj = g.get_adj(curr);
-        for(const auto& i: adj)
-            s.emplace(i);
+        visited.insert(curr);
     }
 }
 
@@ -76,15 +94,40 @@ void BFS(const Graph& g, int start)
     while(!q.empty()) {
         int curr = q.front(); q.pop();
 
-        if(visited.find(curr) == visited.end())
+        if(visited.find(curr) == visited.end()) {
             cout << "Visited " << curr << endl;
 
+            const list<int>& adj = g.get_out(curr);
+            for(const int& i: adj)
+                q.emplace(i);
+        }
         visited.insert(curr);
-
-        const list<int>& adj = g.get_adj(curr);
-        for(const int& i: adj)
-            q.emplace(i);
     }
+}
+
+map<int, int> shortest_distance(const Graph& g, int start)
+{
+    map<int, int> distances;
+
+    for(const auto& p: g.get_graph())
+        distances[p.first] = -1;
+
+    queue<int> q;
+    q.push(start);
+    distances[start] = 0;
+
+    while(!q.empty()) {
+        int curr = q.front(); q.pop();
+        const list<int>& adj = g.get_out(curr);
+        for(const int& i: adj) {
+            if(distances[i] == -1) {
+                distances[i] = distances[curr] + 1;
+                q.push(i);
+            }
+        }
+    }
+
+    return distances;
 }
 
 #endif
