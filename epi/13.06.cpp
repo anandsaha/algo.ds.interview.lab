@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <algorithm>
+#include <fstream>
 
 using namespace std;
 
@@ -51,6 +52,15 @@ void k_most_used(size_t k, const vector<string>& words)
 int main()
 {
 
-    vector<string> v {"hello", "world", "hello", "world", "happy", "hello"};
-    k_most_used(2, v);
+    vector<string> words;
+
+    ifstream file("shakespeare.txt");
+    string word;
+
+    while(file >> word) {
+        words.push_back(word);
+    }
+    file.close();
+
+    k_most_used(10, words);
 }
